@@ -1,7 +1,11 @@
 var SPIN_STATE = 0; // 0 -> Hasn't started, 1 -> Spinning, 2 -> Stopped spinning
 
 function startUp() {
-    roulette = new Roulette();
+    chore_selector = new ChoreSelector();
+    roulette = new Roulette(chore_selector);
+    spin_button = createButton("Roda");
+    spin_button.position(100, 100);
+    spin_button.mousePressed(startSpin);
 }
 
 function startSpin() {
@@ -10,16 +14,9 @@ function startSpin() {
     SPIN_STATE = 1;
 }
 
-function preload() {
-
-}
-
 function setup() {  
     createCanvas(1200, 800);
     startUp();
-    spin_button = createButton("Roda");
-    spin_button.position(100, 100);
-    spin_button.mousePressed(startSpin);
 }
 
 function draw() {

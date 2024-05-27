@@ -1,28 +1,33 @@
-let RADIUS = 500;
+let ROULETTE_RADIUS = 500;
 let ROULETTE_INITIAL_X = 0;
 let ROULETTE_INITIAL_Y = 0;
 let angle = 0;
 let eps = 1e-4;
 
-function Roulette() {
+function Roulette(chore_selector) {
     this.x = ROULETTE_INITIAL_X;
     this.y = ROULETTE_INITIAL_X;
     this.angular_speed = 0;
     this.angular_acceleration = 0;
-    this.radius = RADIUS;
+    this.radius = ROULETTE_RADIUS;
     this.arcs = [];
     this.angle = 0;
+    this.chore_selector = chore_selector
+    this.chores = []
 
-    this.initRoulette = function() {
-        // TODO: encapsulate, allow editing and persist chores list
-        this.chores = ['doar roupa', 'consertar guitarra', 'trocar lampada', 'make n roll', 'finalizar chuveiros', 'pintar os quartos'];
-        num_chores = this.chores.length;
-        for (let i = 0; i < num_chores; i++) {
-            this.arcs.push(new RouletteArc(this.chores[i], num_chores, this.radius, i));
+    this.updateChores = function() {
+        new_chores = this.chore_selector.getChores();
+        // No need to update arcs if chores haven't changed
+        if (this.chores.length != new_chores.length) {
+            this.chores = new_chores.slice();
+            this.arcs = [];
+            for (let i = 0; i < this.chores.length; i++) {
+                this.arcs.push(new RouletteArc(this.chores[i], this.chores.length, this.radius, i));
+            }
         }
     }
 
-    this.initRoulette();
+    this.updateChores();
 
     this.buildTriangle = function() {
         fill('red');
@@ -33,7 +38,7 @@ function Roulette() {
     }
 
     this.display = function() {
-        for (let i = 0; i < num_chores; i++) {
+        for (let i = 0; i < this.arcs.length; i++) {
             this.arcs[i].display();
         }
         this.buildTriangle();
@@ -57,7 +62,7 @@ function Roulette() {
     }
 
     this.update = function() {
-        // console.log(this.angular_speed);
+        this.updateChores();
         this.angle += this.angular_speed;
         if (this.angle > 2 * PI) {
             this.angle -= 2 * PI;
@@ -73,7 +78,8 @@ function Roulette() {
     }
 
     this.getWinningChore = function() {
-        for (let i = 0; i < num_chores; i++) {
+        if (this.chores.length == 1) return 0;
+        for (let i = 0; i < this.chores.length; i++) {
             if (this.arcs[i].contains(this.angle)) {
                 return this.arcs[i].chore;
             }
